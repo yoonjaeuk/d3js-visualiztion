@@ -1,4 +1,3 @@
-// generate some data
 const arr = [];
 const cats = ['c1', 'c2', 'c3'];
 for (let i = 0; i < 100; ++i) {
@@ -9,13 +8,24 @@ for (let i = 0; i < 100; ++i) {
     cat2: cats[Math.floor(Math.random() * 3)],
   });
 }
-const lineup = LineUpJS.asLineUp(document.body, arr);
-/*var d;
 
-function makeRank() {
-  var rank = {};
-  for (var i = 0; i < d.length; i++) {
-    rank[d[i].title] = i;
-  }
-  return rank;
-}*/
+const builder = LineUpJS.builder(arr);
+
+// manually define columns
+builder
+  .column(LineUpJS.buildStringColumn('d').label('Label').width(100))
+  .column(LineUpJS.buildCategoricalColumn('cat', cats).color('green'))
+  .column(LineUpJS.buildCategoricalColumn('cat2', cats).color('blue'))
+  .column(LineUpJS.buildNumberColumn('a', [0, 10]).color('blue'));
+
+// and two rankings
+const ranking = LineUpJS.buildRanking()
+  .supportTypes()
+  .allColumns() // add all columns
+  .impose('a+cat', 'a', 'cat2') // create composite column
+  .groupBy('cat')
+  .sortBy('a', 'desc');
+
+builder.defaultRanking().ranking(ranking);
+
+const lineup = builder.build(document.body);
